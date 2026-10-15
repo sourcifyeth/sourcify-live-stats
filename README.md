@@ -157,7 +157,7 @@ data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address
   timestamp. So parse it as a date, and do not expect a fixed length.
 
 When a browser connects, and the total is known, the service sends one event at
-once. That event has the last 5 shown items, newest first. After that, each
+once. That event has the last 30 shown items, newest first. After that, each
 event has exactly one item.
 
 After a restart the total is unknown until the first new match arrives. During
@@ -207,7 +207,7 @@ level.
 src/index.ts        Starts everything and handles SIGTERM.
 src/config.ts       Reads the environment variables.
 src/pubsub.ts       Parses a log entry and runs the Pub/Sub streaming pull.
-src/state.ts        Keeps the total, the buffer and the last 5 items. Picks the next item.
+src/state.ts        Keeps the total, the buffer and the last 30 items. Picks the next item.
 src/broadcaster.ts  Runs the 500 ms tick and the 20 s ping. Writes to all streams.
 src/http.ts         The Express app with /live/stream and /live/health.
 src/logger.ts       JSON logger (winston).

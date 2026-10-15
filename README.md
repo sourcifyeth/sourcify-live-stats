@@ -96,6 +96,7 @@ The Pub/Sub message body is the full Cloud Logging entry as JSON:
     "creationMatch": null,
     "match": "match",
     "verifiedAt": "2026-10-15T09:57:56Z",
+    "name": "MyToken",
     "service": "server",
     "timestamp": "2026-10-15T09:57:56.579Z"
   },
@@ -117,6 +118,7 @@ The service uses these fields from `jsonPayload`:
 | `match`      | no       | `"exact_match"` or `"match"`.                                                   |
 | `verifiedAt` | no       | The database time of the match. If it is missing, the service uses `timestamp`. |
 | `timestamp`  | no       | If it is missing, the service uses the entry `timestamp`.                       |
+| `name`       | no       | The contract name. Older server versions do not log it.                         |
 
 If a message is not valid JSON, or if a required field is missing, the service
 logs a warning and skips it. The service acknowledges ("acks") every message
@@ -147,7 +149,7 @@ Each event uses the default event type (there is no `event:` line):
 
 ```
 id: 56150969
-data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56Z"}]}
+data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56Z","name":"MyToken"}]}
 ```
 
 - `id` and `total` are the newest match id.
@@ -155,9 +157,12 @@ data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address
 - `verifiedAt` is an ISO 8601 time, or `null`. It has whole seconds when the
   server log has `verifiedAt`, and milliseconds when the service uses a log
   timestamp. So parse it as a date, and do not expect a fixed length.
+- `name` is the contract name, or `null`. It is `null` when the log line has
+  no name, or when the name is not a non-empty string. Log lines from older
+  server versions have no name. The field is always in the item.
 
 When a browser connects, and the total is known, the service sends one event at
-once. That event has the last 5 shown items, newest first. After that, each
+once. That event has the last 30 shown items, newest first. After that, each
 event has exactly one item.
 
 After a restart the total is unknown until the first new match arrives. During
@@ -207,7 +212,7 @@ level.
 src/index.ts        Starts everything and handles SIGTERM.
 src/config.ts       Reads the environment variables.
 src/pubsub.ts       Parses a log entry and runs the Pub/Sub streaming pull.
-src/state.ts        Keeps the total, the buffer and the last 5 items. Picks the next item.
+src/state.ts        Keeps the total, the buffer and the last 30 items. Picks the next item.
 src/broadcaster.ts  Runs the 500 ms tick and the 20 s ping. Writes to all streams.
 src/http.ts         The Express app with /live/stream and /live/health.
 src/logger.ts       JSON logger (winston).

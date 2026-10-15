@@ -11,6 +11,7 @@ const sample = {
   creationMatch: null,
   match: "match",
   verifiedAt: "2026-10-15T09:57:56Z",
+  name: "MyToken",
   timestamp: "2026-10-15T09:57:56.579Z",
 };
 
@@ -26,9 +27,29 @@ describe("parseLogEntry", () => {
         address: "0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC",
         match: "match",
         verifiedAt: "2026-10-15T09:57:56Z",
+        name: "MyToken",
       },
     });
   });
+
+  it("parses a log entry without a name as name null", () => {
+    const result = parseLogEntry(logEntry({ ...sample, name: undefined }));
+    assert.ok(result.ok);
+    assert.equal(result.match.name, null);
+  });
+
+  for (const [label, value] of [
+    ["an empty string", ""],
+    ["a number", 42],
+    ["an object", { name: "MyToken" }],
+    ["null", null],
+  ] as const) {
+    it(`ignores a name that is ${label}`, () => {
+      const result = parseLogEntry(logEntry({ ...sample, name: value }));
+      assert.ok(result.ok);
+      assert.equal(result.match.name, null);
+    });
+  }
 
   it("accepts a numeric matchId and a numeric chainId", () => {
     const result = parseLogEntry(

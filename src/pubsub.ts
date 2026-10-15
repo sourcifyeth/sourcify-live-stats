@@ -67,10 +67,15 @@ export function parseLogEntry(data: Buffer | string): ParseResult {
         : typeof entry.timestamp === "string"
           ? entry.timestamp
           : null;
+  // Log lines from older server versions have no name.
+  const name =
+    typeof payload.name === "string" && payload.name !== ""
+      ? payload.name
+      : null;
 
   return {
     ok: true,
-    match: { id, matchId, chainId, address, match, verifiedAt },
+    match: { id, matchId, chainId, address, match, verifiedAt, name },
   };
 }
 

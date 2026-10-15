@@ -12,6 +12,7 @@ function toItem(match: NewMatch): MatchItem {
     address: match.address,
     match: match.match,
     verifiedAt: match.verifiedAt,
+    name: match.name,
   };
 }
 

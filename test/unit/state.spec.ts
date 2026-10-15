@@ -33,6 +33,26 @@ describe("LiveState", () => {
     assert.equal(state.newestId, 50);
   });
 
+  it("sends the item with all its fields, including the name", () => {
+    const state = new LiveState();
+    state.add(newMatch(7));
+    assert.deepEqual(state.takeNext(), {
+      matchId: "7",
+      chainId: "1",
+      address: `0x${"7".padStart(40, "0")}`,
+      match: "exact_match",
+      verifiedAt: "2026-10-15T09:57:56.579Z",
+      name: "MyToken",
+    });
+  });
+
+  it("sends name null for a match without a name", () => {
+    const state = new LiveState();
+    state.add({ ...newMatch(8), name: null });
+    assert.equal(state.takeNext()?.name, null);
+    assert.equal(state.recent[0].name, null);
+  });
+
   it("prefers a chain that is not among the recent items", () => {
     const state = new LiveState();
     state.add(newMatch(1, "8453"));

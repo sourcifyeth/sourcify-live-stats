@@ -23,5 +23,6 @@ export function newMatch(id: number, chainId = "1"): NewMatch {
     address: `0x${id.toString(16).padStart(40, "0")}`,
     match: "exact_match",
     verifiedAt: "2026-10-15T09:57:56.579Z",
+    name: "MyToken",
   };
 }

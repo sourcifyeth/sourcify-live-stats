@@ -147,12 +147,14 @@ Each event uses the default event type (there is no `event:` line):
 
 ```
 id: 56150969
-data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56.579Z"}]}
+data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56Z"}]}
 ```
 
 - `id` and `total` are the newest match id.
 - `matchId` and `chainId` are strings.
-- `verifiedAt` is an ISO 8601 time, or `null`.
+- `verifiedAt` is an ISO 8601 time, or `null`. It has whole seconds when the
+  server log has `verifiedAt`, and milliseconds when the service uses a log
+  timestamp. So parse it as a date, and do not expect a fixed length.
 
 When a browser connects, and the total is known, the service sends one event at
 once. That event has the last 5 shown items, newest first. After that, each

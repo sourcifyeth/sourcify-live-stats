@@ -1,0 +1,40 @@
+{
+  "name": "sourcify-live-stats",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Streams Sourcify's live verified-contract count and newest matches to browsers over Server-Sent Events",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint . && prettier . --check",
+    "format": "eslint . --fix && prettier . --write",
+    "test": "node --require ts-node/register --test --test-timeout=30000 'test/**/*.spec.ts'",
+    "test:unit": "node --require ts-node/register --test --test-timeout=30000 'test/unit/**/*.spec.ts'",
+    "test:integration": "node --require ts-node/register --test --test-timeout=30000 'test/integration/**/*.spec.ts'",
+    "emulator:setup": "ts-node scripts/emulator.ts setup",
+    "emulator:publish": "ts-node scripts/emulator.ts publish"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "6.1.0",
+    "express": "5.2.1",
+    "winston": "3.19.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/express": "5.0.6",
+    "@types/node": "22.20.1",
+    "eslint": "10.7.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.7.0",
+    "prettier": "3.9.6",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.65.0"
+  }
+}

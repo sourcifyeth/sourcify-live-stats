@@ -91,10 +91,11 @@ The Pub/Sub message body is the full Cloud Logging entry as JSON:
     "message": "Stored to SourcifyDatabase",
     "matchId": "56150969",
     "address": "0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC",
-    "chainId": 8453,
-    "runtimeMatch": "partial",
+    "chainId": "8453",
+    "runtimeMatch": "match",
     "creationMatch": null,
     "match": "match",
+    "verifiedAt": "2026-10-15T09:57:56Z",
     "service": "server",
     "timestamp": "2026-10-15T09:57:56.579Z"
   },
@@ -108,13 +109,14 @@ The Pub/Sub message body is the full Cloud Logging entry as JSON:
 
 The service uses these fields from `jsonPayload`:
 
-| Field       | Required | Notes                                                     |
-| ----------- | -------- | --------------------------------------------------------- |
-| `matchId`   | yes      | A string or a number of digits.                           |
-| `address`   | yes      | The contract address.                                     |
-| `chainId`   | yes      | A number or a string of digits.                           |
-| `match`     | no       | `"exact_match"` or `"match"`.                             |
-| `timestamp` | no       | If it is missing, the service uses the entry `timestamp`. |
+| Field        | Required | Notes                                                                           |
+| ------------ | -------- | ------------------------------------------------------------------------------- |
+| `matchId`    | yes      | A string or a number of digits.                                                 |
+| `address`    | yes      | The contract address.                                                           |
+| `chainId`    | yes      | A number or a string of digits.                                                 |
+| `match`      | no       | `"exact_match"` or `"match"`.                                                   |
+| `verifiedAt` | no       | The database time of the match. If it is missing, the service uses `timestamp`. |
+| `timestamp`  | no       | If it is missing, the service uses the entry `timestamp`.                       |
 
 If a message is not valid JSON, or if a required field is missing, the service
 logs a warning and skips it. The service acknowledges ("acks") every message
@@ -145,12 +147,14 @@ Each event uses the default event type (there is no `event:` line):
 
 ```
 id: 56150969
-data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56.579Z"}]}
+data: {"total":56150969,"items":[{"matchId":"56150969","chainId":"8453","address":"0x0d89Cb4f4220B7BECB5A54f9e16De41a615987FC","match":"exact_match","verifiedAt":"2026-10-15T09:57:56Z"}]}
 ```
 
 - `id` and `total` are the newest match id.
 - `matchId` and `chainId` are strings.
-- `verifiedAt` is an ISO 8601 time, or `null`.
+- `verifiedAt` is an ISO 8601 time, or `null`. It has whole seconds when the
+  server log has `verifiedAt`, and milliseconds when the service uses a log
+  timestamp. So parse it as a date, and do not expect a fixed length.
 
 When a browser connects, and the total is known, the service sends one event at
 once. That event has the last 5 shown items, newest first. After that, each

@@ -57,12 +57,16 @@ export function parseLogEntry(data: Buffer | string): ParseResult {
   }
 
   const match = typeof payload.match === "string" ? payload.match : null;
+  // verifiedAt is the database time of the match. The log timestamps are
+  // a fallback for log entries without it.
   const verifiedAt =
-    typeof payload.timestamp === "string"
-      ? payload.timestamp
-      : typeof entry.timestamp === "string"
-        ? entry.timestamp
-        : null;
+    typeof payload.verifiedAt === "string"
+      ? payload.verifiedAt
+      : typeof payload.timestamp === "string"
+        ? payload.timestamp
+        : typeof entry.timestamp === "string"
+          ? entry.timestamp
+          : null;
 
   return {
     ok: true,

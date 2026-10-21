@@ -5,6 +5,8 @@ export interface MatchItem {
   address: string;
   match: string | null;
   verifiedAt: string | null;
+  /** The contract name, or null when the log line has no name (older server versions). */
+  name: string | null;
 }
 
 /** A match plus its numeric id, used for ordering. */

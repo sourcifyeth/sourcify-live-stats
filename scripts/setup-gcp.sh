@@ -55,7 +55,10 @@ SERVICE="sourcify-${ENV_NAME}-live-stats"
 SERVER_SERVICE="sourcify-${ENV_NAME}-server"
 RUNTIME_SA_NAME="sourcify-${ENV_NAME}-live-stats"
 RUNTIME_SA="${RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
-DEPLOY_SA_NAME="sourcify-live-stats-${ENV_NAME}-cd"
+# A service account ID can have at most 30 characters. "sourcify-live-stats-production-cd" has 33,
+# so production uses "prod" here. The staging name stays the same.
+DEPLOY_SA_SHORT_ENV="${ENV_NAME/production/prod}"
+DEPLOY_SA_NAME="sourcify-live-stats-${DEPLOY_SA_SHORT_ENV}-cd"
 DEPLOY_SA="${DEPLOY_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 NEG="sourcify-${ENV_NAME}-live-stats-neg"
 BACKEND="sourcify-${ENV_NAME}-live-stats-backend"

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { LiveState, RECENT_SIZE } from "../../src/state";
+import { CHAIN_VARIETY_SIZE, LiveState, RECENT_SIZE } from "../../src/state";
 import { newMatch } from "../helpers";
 
 describe("LiveState", () => {
@@ -33,6 +33,26 @@ describe("LiveState", () => {
     assert.equal(state.newestId, 50);
   });
 
+  it("sends the item with all its fields, including the name", () => {
+    const state = new LiveState();
+    state.add(newMatch(7));
+    assert.deepEqual(state.takeNext(), {
+      matchId: "7",
+      chainId: "1",
+      address: `0x${"7".padStart(40, "0")}`,
+      match: "exact_match",
+      verifiedAt: "2026-10-15T09:57:56.579Z",
+      name: "MyToken",
+    });
+  });
+
+  it("sends name null for a match without a name", () => {
+    const state = new LiveState();
+    state.add({ ...newMatch(8), name: null });
+    assert.equal(state.takeNext()?.name, null);
+    assert.equal(state.recent[0].name, null);
+  });
+
   it("prefers a chain that is not among the recent items", () => {
     const state = new LiveState();
     state.add(newMatch(1, "8453"));
@@ -55,17 +75,15 @@ describe("LiveState", () => {
     assert.equal(state.takeNext()?.matchId, "3");
   });
 
-  it("keeps the last 5 sent items, newest first", () => {
+  it("keeps the last RECENT_SIZE sent items, newest first", () => {
     const state = new LiveState();
-    for (let id = 1; id <= 8; id++) {
+    for (let id = 1; id <= RECENT_SIZE + 3; id++) {
       state.add(newMatch(id, String(id)));
       state.takeNext();
     }
-    assert.deepEqual(
-      state.recent.map((m) => m.matchId),
-      ["8", "7", "6", "5", "4"],
-    );
     assert.equal(state.recent.length, RECENT_SIZE);
+    assert.equal(state.recent[0].matchId, String(RECENT_SIZE + 3));
+    assert.equal(state.recent[RECENT_SIZE - 1].matchId, "4");
     assert.ok(!("id" in state.recent[0]));
   });
 
@@ -75,5 +93,20 @@ describe("LiveState", () => {
     state.takeNext();
     state.add(newMatch(7));
     assert.equal(state.takeNext(), null);
+  });
+
+  it("prefers a chain again once it left the last CHAIN_VARIETY_SIZE items", () => {
+    const state = new LiveState();
+    // Chain "1" is sent first, then CHAIN_VARIETY_SIZE items on other chains.
+    state.add(newMatch(1, "1"));
+    state.takeNext();
+    for (let i = 0; i < CHAIN_VARIETY_SIZE; i++) {
+      state.add(newMatch(2 + i, String(100 + i)));
+      state.takeNext();
+    }
+    // Chain "1" is out of the variety window, chain "100" is in it.
+    state.add(newMatch(50, "1"));
+    state.add(newMatch(51, "100"));
+    assert.equal(state.takeNext()?.matchId, "50");
   });
 });

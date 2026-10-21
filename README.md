@@ -323,7 +323,7 @@ environment has its own variable `GCP_DEPLOY_SERVICE_ACCOUNT`.
 > `GCP_DEPLOY_SERVICE_ACCOUNT` in each GitHub Environment:
 >
 > - `staging`: `sourcify-live-stats-staging-cd@sourcify-project.iam.gserviceaccount.com`
-> - `production`: `sourcify-live-stats-production-cd@sourcify-project.iam.gserviceaccount.com`
+> - `production`: `sourcify-live-stats-prod-cd@sourcify-project.iam.gserviceaccount.com`
 >
 > Also give the `production` environment a deployment branch rule that
 > allows only `main`. See "Why production needs a branch rule" below.
@@ -367,7 +367,9 @@ The script prints each command before it runs it. It does these steps:
    deadline 10 s, message retention 10 minutes, no expiry.
 4. Creates the runtime service account `sourcify-<env>-live-stats`. It can
    only read from that one subscription (`roles/pubsub.subscriber`).
-5. Creates the deploy service account `sourcify-live-stats-<env>-cd`. It
+5. Creates the deploy service account `sourcify-live-stats-<env>-cd`, with
+   `prod` as `<env>` for production. A service account ID can have at most 30
+   characters, and `sourcify-live-stats-production-cd` has 33. It
    gives it:
    - `roles/iam.workloadIdentityUser` for
      `principalSet://iam.googleapis.com/projects/1019539084286/locations/global/workloadIdentityPools/github/attribute.repository/sourcifyeth/sourcify-live-stats`
